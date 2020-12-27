@@ -1,4 +1,4 @@
-# MacroKeyBorad
+# MacroKeyBoard
 Macrokeyboard using Trinket M0, cherry key and 3D print
 
 ## Sources Used
