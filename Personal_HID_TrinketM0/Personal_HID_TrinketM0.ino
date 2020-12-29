@@ -7,7 +7,7 @@ Adafruit_DotStar strip = Adafruit_DotStar(1, INTERNAL_DS_DATA, INTERNAL_DS_CLK, 
 enum MODE
 {
   Red,
-  Media,
+  Media, 
   Blue,
   Pink
 };
@@ -16,6 +16,7 @@ int Mode = 0;
 enum PRESSTYPE
 {
   TAP,
+  DOUBLETAP,
   LONG
 };
 
@@ -64,6 +65,14 @@ void Keypress(int Key, int pressType)
       break;
       
      case(Pink):
+      //Test TAP TYPE
+      if(Key == 0)
+      {
+        if(pressType == TAP)strip.setPixelColor(0, 16, 0, 16);
+        if(pressType == DOUBLETAP)strip.setPixelColor(0, 16, 16, 0);
+        if(pressType == LONG)strip.setPixelColor(0, 0, 16, 16);
+        strip.show();
+      }
       if(Key == 3)
       {
         if(pressType == TAP){Mode =0;strip.setPixelColor(0, 16, 0, 0); strip.show();} //LED RED for next mode.
@@ -106,9 +115,20 @@ void loop() {
     while (digitalRead(KeyNum) == 0 && ((stopi - start) <= 175)) stopi = millis(); //attente 175ms longpush
 
     if ((stopi - start) <= 175)
-    {
-      Keypress(KeyNum,TAP);
-      delay(50);
+    {   //Key pressed 
+        start = millis();
+        stopi = millis();
+        delay(50);
+        while (digitalRead(KeyNum) == 1 && ((stopi - start) <= 175)) stopi = millis(); //attente 175ms detection seconde touche pressé.
+        if((stopi - start)<=175)
+        { //Double TAP
+          Keypress(KeyNum,DOUBLETAP);
+        }
+        else
+        {
+          Keypress(KeyNum,TAP);
+        }
+        delay(50);
     }
     else
     {
