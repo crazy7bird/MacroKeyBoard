@@ -37,11 +37,13 @@ void Keypress(int Key, int pressType)
       if(Key==0)
       {
         if(pressType == TAP)Consumer.write(MEDIA_NEXT);
+        if(pressType == DOUBLETAP){Consumer.write(MEDIA_NEXT);Consumer.write(MEDIA_NEXT);}
         if(pressType == LONG)Consumer.write(MEDIA_VOLUME_UP);
       }
       if(Key==1)
       {
         if(pressType == TAP)Consumer.write(MEDIA_PREV);
+        if(pressType == DOUBLETAP){Consumer.write(MEDIA_PREV);Consumer.write(MEDIA_PREV);}
         if(pressType == LONG)Consumer.write(MEDIA_VOLUME_DOWN);
       }
       if(Key==2)
@@ -113,22 +115,22 @@ void loop() {
     int stopi = millis();
     //int longpush = 0;
 
-    delay(50);
-    while (digitalRead(KeyNum) == 0 && ((stopi - start) <= 175)) stopi = millis(); //attente 175ms longpush
+    delay(75);
+    while (digitalRead(KeyNum) == 0 && ((stopi - start) <= 200)) stopi = millis(); //attente 175ms longpush
 
-    if ((stopi - start) <= 175)
+    if ((stopi - start) <= 200)
     {   //Key pressed 
         start = millis();
         stopi = millis();
-        delay(50);
-        while (digitalRead(KeyNum) == 1 && ((stopi - start) <= 175)) stopi = millis(); //attente 175ms detection seconde touche pressé.
-        if((stopi - start)<=175)
+        delay(75);
+        while (digitalRead(KeyNum) == 1 && ((stopi - start) <= 200)) stopi = millis(); //attente 175ms detection seconde touche pressé.
+        if((stopi - start)<=200)
         { 
           start = millis();
           stopi = millis();
-          delay(50);
-          while (digitalRead(KeyNum) == 1 && ((stopi - start) <= 175)) stopi = millis(); //attente 175ms detection seconde touche pressé.
-          if((stopi - start)<=175)
+          delay(75);
+          while (digitalRead(KeyNum) == 1 && ((stopi - start) <= 200)) stopi = millis(); //attente 175ms detection seconde touche pressé.
+          if((stopi - start)<=200)
           {
             Keypress(KeyNum,TRIPLETAP);
           }
@@ -144,14 +146,14 @@ void loop() {
         { //SIMPLE TAP
           Keypress(KeyNum,TAP);
         }
-        delay(50);
+        delay(200);
     }
     else
     {
       while (digitalRead(KeyNum) == 0)
       {
         Keypress(KeyNum,LONG);
-        delay(150);
+        delay(125);
       }
     }
     Keyboard.releaseAll();
