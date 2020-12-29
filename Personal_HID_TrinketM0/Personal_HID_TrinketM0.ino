@@ -17,6 +17,7 @@ enum PRESSTYPE
 {
   TAP,
   DOUBLETAP,
+  TRIPLETAP,
   LONG
 };
 
@@ -70,6 +71,7 @@ void Keypress(int Key, int pressType)
       {
         if(pressType == TAP)strip.setPixelColor(0, 16, 0, 16);
         if(pressType == DOUBLETAP)strip.setPixelColor(0, 16, 16, 0);
+        if(pressType == TRIPLETAP)strip.setPixelColor(0, 255, 255, 255);
         if(pressType == LONG)strip.setPixelColor(0, 0, 16, 16);
         strip.show();
       }
@@ -121,11 +123,25 @@ void loop() {
         delay(50);
         while (digitalRead(KeyNum) == 1 && ((stopi - start) <= 175)) stopi = millis(); //attente 175ms detection seconde touche pressé.
         if((stopi - start)<=175)
-        { //Double TAP
-          Keypress(KeyNum,DOUBLETAP);
+        { 
+          start = millis();
+          stopi = millis();
+          delay(50);
+          while (digitalRead(KeyNum) == 1 && ((stopi - start) <= 175)) stopi = millis(); //attente 175ms detection seconde touche pressé.
+          if((stopi - start)<=175)
+          {
+            Keypress(KeyNum,TRIPLETAP);
+          }
+          
+          else
+          {
+            //Double TAP
+            Keypress(KeyNum,DOUBLETAP);
+          }
+
         }
         else
-        {
+        { //SIMPLE TAP
           Keypress(KeyNum,TAP);
         }
         delay(50);
