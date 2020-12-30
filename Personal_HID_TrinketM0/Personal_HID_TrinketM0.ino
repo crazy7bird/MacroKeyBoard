@@ -49,7 +49,7 @@ void pressedKey(int Key, int pressType)
       if(Key==2)
       {
         if(pressType == TAP)Consumer.write(MEDIA_PLAY_PAUSE);
-        if(pressType == DOUBLETAP){Keyboard.press(KEY_LEFT_SHIFT);Keyboard.press(KEY_LEFT_CTRL);Keyboard.print("q");} //N = M from bépo to Querty.
+        if(pressType == DOUBLETAP){Keyboard.press(KEY_LEFT_SHIFT);Keyboard.press(KEY_LEFT_CTRL);Keyboard.print("'");} // ' for m mute in discord  
       }
       if(Key == 3)
       {
@@ -60,7 +60,7 @@ void pressedKey(int Key, int pressType)
      case(Blue):
       if(Key == 2)
       {
-      if(pressType == TAP){Keyboard.press(KEY_LEFT_WINDOWS);Keyboard.print("l");}
+      if(pressType == TAP){Keyboard.press(KEY_LEFT_WINDOWS);Keyboard.print("o");} //o for l windows + l
       }
       if(Key == 3)
       {
