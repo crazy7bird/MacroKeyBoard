@@ -17,7 +17,6 @@ enum PRESSTYPE
 {
   TAP,
   DOUBLETAP,
-  TRIPLETAP,
   LONG
 };
 
@@ -29,7 +28,7 @@ void Keypress(int Key, int pressType)
     case(Red):
       if(Key == 3)
       {
-        if(pressType == TAP){Mode ++;strip.setPixelColor(0, 0, 16, 0); strip.show();} //LED GREEN for next mode.
+        Mode ++;strip.setPixelColor(0, 0, 16, 0); strip.show(); //LED GREEN for next mode.
       }
       break;
       
@@ -52,7 +51,7 @@ void Keypress(int Key, int pressType)
       }
       if(Key == 3)
       {
-        if(pressType == TAP){Mode ++;strip.setPixelColor(0, 0, 0, 16); strip.show();} //LED BLUE for next mode.
+        Mode ++;strip.setPixelColor(0, 0, 0, 16); strip.show(); //LED BLUE for next mode.
       }
       break;
       
@@ -63,7 +62,7 @@ void Keypress(int Key, int pressType)
       }
       if(Key == 3)
       {
-        if(pressType == TAP){Mode ++;strip.setPixelColor(0, 16, 5, 9); strip.show();} //LED PINK for next mode.
+        Mode ++;strip.setPixelColor(0, 16, 5, 9); strip.show(); //LED PINK for next mode.
       }
       break;
       
@@ -73,13 +72,12 @@ void Keypress(int Key, int pressType)
       {
         if(pressType == TAP)strip.setPixelColor(0, 16, 0, 16);
         if(pressType == DOUBLETAP)strip.setPixelColor(0, 16, 16, 0);
-        if(pressType == TRIPLETAP)strip.setPixelColor(0, 255, 255, 255);
         if(pressType == LONG)strip.setPixelColor(0, 0, 16, 16);
         strip.show();
       }
       if(Key == 3)
       {
-        if(pressType == TAP){Mode =0;strip.setPixelColor(0, 16, 0, 0); strip.show();} //LED RED for next mode.
+        Mode =0;strip.setPixelColor(0, 16, 0, 0); strip.show(); //LED RED for next mode.
       }
       break;
   }
@@ -97,7 +95,8 @@ void setup() {
   pinMode(3, INPUT_PULLUP);
   Keyboard.begin();
   Consumer.begin();
-
+  //Init Leds 
+  strip.setPixelColor(0, 16, 0, 0); strip.show();
 }
 
 // the loop function runs over and over again forever
@@ -126,21 +125,8 @@ void loop() {
         while (digitalRead(KeyNum) == 1 && ((stopi - start) <= 200)) stopi = millis(); //attente 175ms detection seconde touche pressé.
         if((stopi - start)<=200)
         { 
-          start = millis();
-          stopi = millis();
-          delay(75);
-          while (digitalRead(KeyNum) == 1 && ((stopi - start) <= 200)) stopi = millis(); //attente 175ms detection seconde touche pressé.
-          if((stopi - start)<=200)
-          {
-            Keypress(KeyNum,TRIPLETAP);
-          }
-          
-          else
-          {
-            //Double TAP
-            Keypress(KeyNum,DOUBLETAP);
-          }
-
+          //Double TAP
+          Keypress(KeyNum,DOUBLETAP);
         }
         else
         { //SIMPLE TAP
