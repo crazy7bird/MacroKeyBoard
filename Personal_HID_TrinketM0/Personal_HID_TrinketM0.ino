@@ -4,6 +4,7 @@
 #include "HID-Project/HID-Project.h"
 Adafruit_DotStar strip = Adafruit_DotStar(1, INTERNAL_DS_DATA, INTERNAL_DS_CLK, DOTSTAR_BGR);
 
+
 enum MODE
 {
   Red,
@@ -20,8 +21,8 @@ enum PRESSTYPE
   LONG
 };
 
-
-void Keypress(int Key, int pressType)
+//Actions after a Key pressed.
+void pressedKey(int Key, int pressType)
 {
   switch(Mode)
   {
@@ -48,6 +49,7 @@ void Keypress(int Key, int pressType)
       if(Key==2)
       {
         if(pressType == TAP)Consumer.write(MEDIA_PLAY_PAUSE);
+        if(pressType == DOUBLETAP){Keyboard.press(KEY_LEFT_SHIFT);Keyboard.press(KEY_LEFT_CTRL);Keyboard.print("q");} //N = M from bépo to Querty.
       }
       if(Key == 3)
       {
@@ -58,7 +60,7 @@ void Keypress(int Key, int pressType)
      case(Blue):
       if(Key == 2)
       {
-        if(pressType == TAP){Keyboard.press(KEY_LEFT_WINDOWS);Keyboard.print("l");}
+      if(pressType == TAP){Keyboard.press(KEY_LEFT_WINDOWS);Keyboard.print("l");}
       }
       if(Key == 3)
       {
@@ -81,27 +83,11 @@ void Keypress(int Key, int pressType)
       }
       break;
   }
-  //Keyboard.releaseAll();
 }
 
-
-// the setup function runs once when you press reset or power the board
-void setup() {
-  // initialize digital pin 13 as an output.
-  pinMode(13, OUTPUT);
-  pinMode(0, INPUT_PULLUP);
-  pinMode(1, INPUT_PULLUP);
-  pinMode(2, INPUT_PULLUP);
-  pinMode(3, INPUT_PULLUP);
-  Keyboard.begin();
-  Consumer.begin();
-  //Init Leds 
-  strip.setPixelColor(0, 16, 0, 0); strip.show();
-}
-
-// the loop function runs over and over again forever
-void loop() {
-
+// POOLING Keyboard pressing.
+void poolingKeys(void)
+{
   int KeyNum = -1;
   if(!digitalRead(0)) KeyNum =0;
   if(!digitalRead(1)) KeyNum =1;
@@ -126,11 +112,11 @@ void loop() {
         if((stopi - start)<=200)
         { 
           //Double TAP
-          Keypress(KeyNum,DOUBLETAP);
+          pressedKey(KeyNum,DOUBLETAP);
         }
         else
         { //SIMPLE TAP
-          Keypress(KeyNum,TAP);
+          pressedKey(KeyNum,TAP);
         }
         delay(200);
     }
@@ -138,10 +124,69 @@ void loop() {
     {
       while (digitalRead(KeyNum) == 0)
       {
-        Keypress(KeyNum,LONG);
+        pressedKey(KeyNum,LONG);
         delay(125);
       }
     }
     Keyboard.releaseAll();
   }
+}
+
+void ledGaming(void)
+{
+  static char R = 64;
+  static char G = 16;
+  static char B = 0;
+  static char state = 0;
+  static long Time = 0;
+
+  if(millis()- Time > 100)
+  {
+    Time = millis();
+    switch(state)
+    {
+      case(0):
+        R--;
+        G++;
+        if(R==0)state++;
+        break;
+        
+      case(1):
+        G--;
+        B++;
+        if(G==0)state++;
+        break;
+        
+      case(2):
+        B--;
+        R++;
+        if(B==0)state=0;
+        break;
+    }
+    strip.setPixelColor(0, R, G, B); strip.show();
+
+  }
+  
+}
+
+
+// the setup function runs once when you press reset or power the board
+void setup() {
+  // initialize digital pin 13 as an output.
+  pinMode(13, OUTPUT);
+  pinMode(0, INPUT_PULLUP);
+  pinMode(1, INPUT_PULLUP);
+  pinMode(2, INPUT_PULLUP);
+  pinMode(3, INPUT_PULLUP);
+  Keyboard.begin();
+  Consumer.begin();
+  //Init Leds 
+  strip.setPixelColor(0, 16, 0, 0); strip.show();
+}
+
+// the loop function runs over and over again forever
+void loop() 
+{
+  //ledGaming();
+  poolingKeys();
 }
