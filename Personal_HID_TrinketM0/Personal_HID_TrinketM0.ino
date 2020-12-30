@@ -1,6 +1,5 @@
 #include "HID-Project/HID-Project.h"
 #include "ledDriver.h"
-
 #include "secret.h"
 
 
@@ -17,7 +16,19 @@ void pressedPwsKey(int Key, int pressType)
 {
     if(Key==0)
     {
-      if(pressType == TAP){LedState=BLUE;Keyboard.press(KEY_ENTER);Keyboard.release(KEY_ENTER);Keyboard.print("Eakkqrli!");Keyboard.press(KEY_ENTER);Keyboard.release(KEY_ENTER);}
+      if(pressType == TAP)
+      {
+        LedState=BLUE;
+        Keyboard.press(KEY_ENTER);
+        delay(75);
+        Keyboard.releaseAll();
+        delay(75);
+        Keyboard.print(LOGIN);
+        delay(75);
+        Keyboard.press(KEY_ENTER);
+        delay(75);
+        Keyboard.releaseAll();
+      }
     }
     if(Key==1)
     {
