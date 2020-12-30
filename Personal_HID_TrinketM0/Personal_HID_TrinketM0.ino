@@ -4,15 +4,15 @@
 #include "HID-Project/HID-Project.h"
 Adafruit_DotStar strip = Adafruit_DotStar(1, INTERNAL_DS_DATA, INTERNAL_DS_CLK, DOTSTAR_BGR);
 
-
-enum MODE
+enum LEDSTATE
 {
-  Red,
-  Media, 
-  Blue,
-  Pink
+  RED,
+  GREEN,
+  BLUE,
+  WHITE,
+  GAMING
 };
-int Mode = 0;
+char LedState = 0;
 
 enum PRESSTYPE
 {
@@ -21,72 +21,70 @@ enum PRESSTYPE
   LONG
 };
 
-//Actions after a Key pressed.
-void pressedKey(int Key, int pressType)
+//Prototype passWord actions 
+
+void pressedPwsKey(int Key, int pressType)
 {
-  switch(Mode)
+    if(Key==0)
+    {
+      if(pressType == TAP)LedState=BLUE;
+    }
+    if(Key==1)
+    {
+        if(pressType == TAP)LedState=GREEN;
+    }
+    if(Key==2)
+    {
+      if(pressType == TAP)LedState=GAMING;
+    }
+
+    if(Key == 3)
+    {
+      if(pressType == TAP)LedState=WHITE;
+    }
+}
+
+void passWord()
+{
+  long Time = millis();
+  LedState = RED;
+  while((millis()- Time)< 5000)
   {
-    case(Red):
-      if(Key == 3)
-      {
-        Mode ++;strip.setPixelColor(0, 0, 16, 0); strip.show(); //LED GREEN for next mode.
-      }
-      break;
-      
-    case(Media):
-      if(Key==0)
-      {
-        if(pressType == TAP)Consumer.write(MEDIA_NEXT);
-        if(pressType == DOUBLETAP){Consumer.write(MEDIA_NEXT);Consumer.write(MEDIA_NEXT);}
-        if(pressType == LONG)Consumer.write(MEDIA_VOLUME_UP);
-      }
-      if(Key==1)
-      {
-        if(pressType == TAP)Consumer.write(MEDIA_PREV);
-        if(pressType == DOUBLETAP){Consumer.write(MEDIA_PREV);Consumer.write(MEDIA_PREV);}
-        if(pressType == LONG)Consumer.write(MEDIA_VOLUME_DOWN);
-      }
-      if(Key==2)
-      {
-        if(pressType == TAP)Consumer.write(MEDIA_PLAY_PAUSE);
-        if(pressType == DOUBLETAP){Keyboard.press(KEY_LEFT_SHIFT);Keyboard.press(KEY_LEFT_CTRL);Keyboard.print("'");} // ' for m mute in discord  
-      }
-      if(Key == 3)
-      {
-        Mode ++;strip.setPixelColor(0, 0, 0, 16); strip.show(); //LED BLUE for next mode.
-      }
-      break;
-      
-     case(Blue):
-      if(Key == 2)
-      {
-      if(pressType == TAP){Keyboard.press(KEY_LEFT_WINDOWS);Keyboard.print("o");} //o for l windows + l
-      }
-      if(Key == 3)
-      {
-        Mode ++;strip.setPixelColor(0, 16, 5, 9); strip.show(); //LED PINK for next mode.
-      }
-      break;
-      
-     case(Pink):
-      //Test TAP TYPE
-      if(Key == 0)
-      {
-        if(pressType == TAP)strip.setPixelColor(0, 16, 0, 16);
-        if(pressType == DOUBLETAP)strip.setPixelColor(0, 16, 16, 0);
-        if(pressType == LONG)strip.setPixelColor(0, 0, 16, 16);
-        strip.show();
-      }
-      if(Key == 3)
-      {
-        Mode =0;strip.setPixelColor(0, 16, 0, 0); strip.show(); //LED RED for next mode.
-      }
-      break;
+    ledDriver();
+    poolingKeys(&pressedPwsKey);
   }
 }
 
+//Actions after a Key pressed.
+void pressedKey(int Key, int pressType)
+{
+    if(Key==0)
+    {
+      if(pressType == TAP)Consumer.write(MEDIA_NEXT);
+      if(pressType == DOUBLETAP){Consumer.write(MEDIA_NEXT);Consumer.write(MEDIA_NEXT);}
+      if(pressType == LONG)Consumer.write(MEDIA_VOLUME_UP);
+    }
+    if(Key==1)
+    {
+      if(pressType == TAP)Consumer.write(MEDIA_PREV);
+      if(pressType == DOUBLETAP){Consumer.write(MEDIA_PREV);Consumer.write(MEDIA_PREV);}
+      if(pressType == LONG)Consumer.write(MEDIA_VOLUME_DOWN);
+    }
+    if(Key==2)
+    {
+      if(pressType == TAP)Consumer.write(MEDIA_PLAY_PAUSE);
+      if(pressType == DOUBLETAP){Keyboard.press(KEY_LEFT_SHIFT);Keyboard.press(KEY_LEFT_CTRL);Keyboard.print("'");} // ' for m mute in discord  
+    }
+
+    if(Key == 3)
+    {
+      if(pressType == DOUBLETAP){Keyboard.press(KEY_LEFT_WINDOWS);Keyboard.print("o");} //o for l windows + l
+      if(pressType == LONG)passWord();
+    }
+}
+
 // POOLING Keyboard pressing.
-void poolingKeys(void)
+void poolingKeys(void (*callback)(int,int))
 {
   int KeyNum = -1;
   if(!digitalRead(0)) KeyNum =0;
@@ -112,11 +110,11 @@ void poolingKeys(void)
         if((stopi - start)<=200)
         { 
           //Double TAP
-          pressedKey(KeyNum,DOUBLETAP);
+          (*callback)(KeyNum,DOUBLETAP);
         }
         else
         { //SIMPLE TAP
-          pressedKey(KeyNum,TAP);
+          (*callback)(KeyNum,TAP);
         }
         delay(200);
     }
@@ -124,7 +122,7 @@ void poolingKeys(void)
     {
       while (digitalRead(KeyNum) == 0)
       {
-        pressedKey(KeyNum,LONG);
+        (*callback)(KeyNum,LONG);
         delay(125);
       }
     }
@@ -140,32 +138,73 @@ void ledGaming(void)
   static char state = 0;
   static long Time = 0;
 
-  if(millis()- Time > 100)
+  if(millis()- Time > 50)
   {
     Time = millis();
     switch(state)
     {
       case(0):
-        R--;
-        G++;
-        if(R==0)state++;
+        R--;G++;if(R==0)state++;
         break;
         
       case(1):
-        G--;
-        B++;
-        if(G==0)state++;
+        G--;B++;if(G==0)state++;
         break;
         
       case(2):
-        B--;
-        R++;
-        if(B==0)state=0;
+        B--;R++;if(B==0)state=0;
         break;
     }
-    strip.setPixelColor(0, R, G, B); strip.show();
-
+    strip.setPixelColor(0, R, G, B);
   }
+}
+
+void ledDriver(void)
+{
+  static char BeatHeart = 0;
+  static char State = 0;
+  static long Time = 0;
+
+//BeatHeart management 
+  if(millis()- Time > 50)
+  {
+    Time = millis();
+    if(State == 0)
+    {
+      BeatHeart ++;
+      if(BeatHeart == 32 )State = 1;
+    }
+    else
+    {
+      BeatHeart --;
+      if(BeatHeart == 0 )State = 0;
+    }
+  }
+//Appli show 
+  switch(LedState)
+  {
+     case(RED):
+      strip.setPixelColor(0, BeatHeart, 0, 0);
+      break;
+
+    case(GREEN):
+      strip.setPixelColor(0, 0, BeatHeart, 0);
+      break;
+      
+    case(BLUE):
+      strip.setPixelColor(0, 0, 0, BeatHeart);
+      break;
+      
+     case(WHITE):
+      strip.setPixelColor(0, 255, 255, 255);
+      break;
+      
+    case(GAMING):
+      ledGaming();
+      break;
+      
+  }
+  strip.show();
   
 }
 
@@ -181,12 +220,13 @@ void setup() {
   Keyboard.begin();
   Consumer.begin();
   //Init Leds 
-  strip.setPixelColor(0, 16, 0, 0); strip.show();
+  LedState = GAMING;
+  //strip.setPixelColor(0, 16, 0, 0); strip.show();
 }
 
 // the loop function runs over and over again forever
 void loop() 
 {
-  //ledGaming();
-  poolingKeys();
+  ledDriver();
+  poolingKeys(&pressedKey);
 }
