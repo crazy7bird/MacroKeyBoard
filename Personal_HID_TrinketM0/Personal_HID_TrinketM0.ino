@@ -95,7 +95,11 @@ void pressedKey(int Key, int pressType)
     {
       if(pressType == TAP)Consumer.write(MEDIA_PLAY_PAUSE);
       if(pressType == DOUBLETAP){Keyboard.press(KEY_LEFT_WINDOWS); Keyboard.press(KEY_LEFT_CTRL); Keyboard.print("i");}//Windows new virtual desktop win+ctrl+D
-      if(pressType == LONG){Keyboard.press(KEY_LEFT_SHIFT);Keyboard.press(KEY_LEFT_CTRL);Keyboard.print("'");} // ' for m mute in discord  
+      if(pressType == LONG)
+      {
+        Keyboard.press(KEY_LEFT_SHIFT);Keyboard.press(KEY_LEFT_CTRL);Keyboard.print("'");// ' for m mute in discord  
+        while (!digitalRead(2)); //For not mute / unmute 
+      }
     }
 
     if(Key == 3)
