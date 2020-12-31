@@ -82,26 +82,26 @@ void pressedKey(int Key, int pressType)
     if(Key==0)
     {
       if(pressType == TAP)Consumer.write(MEDIA_NEXT);
-      if(pressType == DOUBLETAP); //Windows next virtual desktop
+      if(pressType == DOUBLETAP){Keyboard.press(KEY_LEFT_WINDOWS); Keyboard.press(KEY_LEFT_CTRL); Keyboard.press(KEY_RIGHT_ARROW);} //Windows next virtual desktop win+ctrl+ ->
       if(pressType == LONG)Consumer.write(MEDIA_VOLUME_UP);
     }
     if(Key==1)
     {
       if(pressType == TAP)Consumer.write(MEDIA_PREV);
-      if(pressType == DOUBLETAP);//Windows prev virtual desktop
+      if(pressType == DOUBLETAP){Keyboard.press(KEY_LEFT_WINDOWS); Keyboard.press(KEY_LEFT_CTRL); Keyboard.press(KEY_LEFT_ARROW);}//Windows prev virtual desktop win+ctrl+<-
       if(pressType == LONG)Consumer.write(MEDIA_VOLUME_DOWN);
     }
     if(Key==2)
     {
       if(pressType == TAP)Consumer.write(MEDIA_PLAY_PAUSE);
-      if(pressType == DOUBLETAP);//Windows new virtual desktop
+      if(pressType == DOUBLETAP){Keyboard.press(KEY_LEFT_WINDOWS); Keyboard.press(KEY_LEFT_CTRL); Keyboard.print("i");}//Windows new virtual desktop win+ctrl+D
       if(pressType == LONG){Keyboard.press(KEY_LEFT_SHIFT);Keyboard.press(KEY_LEFT_CTRL);Keyboard.print("'");} // ' for m mute in discord  
     }
 
     if(Key == 3)
     {
-      if(pressType == TAP);//Windows del virtual desktop
-      if(pressType == DOUBLETAP){if(LedState==GAMING){LedState = WHITE;}else{LedState=GAMING;}} //o for l windows + l
+      if(pressType == TAP){if(LedState==GAMING){LedState = WHITE;}else{LedState=GAMING;}} 
+      if(pressType == DOUBLETAP){Keyboard.press(KEY_LEFT_WINDOWS); Keyboard.press(KEY_LEFT_CTRL); Keyboard.press(HID_KEYBOARD_F4);}//Windows del virtual desktop win+ctrl+F4
       if(pressType == LONG)passWord();
     }
 }
