@@ -49,7 +49,7 @@ void ledDriver(void)
   static long Time = 0;
 
 //BeatHeart management 
-  if(millis()- Time > 50)
+  if(millis()- Time > 20)
   {
     Time = millis();
     if(State == 0)

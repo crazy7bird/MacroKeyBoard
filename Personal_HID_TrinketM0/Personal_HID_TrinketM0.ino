@@ -2,7 +2,7 @@
 #include "ledDriver.h"
 #include "secret.h"
 
-
+#define TEMPO 75
 enum PRESSTYPE
 {
   TAP,
@@ -11,49 +11,69 @@ enum PRESSTYPE
 };
 
 //Prototype passWord actions 
-
+int g_PSWDONE ; //Ugly global var 
 void pressedPwsKey(int Key, int pressType)
 {
     if(Key==0)
     {
       if(pressType == TAP)
       {
-        LedState=BLUE;
+        Keyboard.print(START);
+        delay(TEMPO);
         Keyboard.press(KEY_ENTER);
-        delay(75);
+        delay(TEMPO);
         Keyboard.releaseAll();
-        delay(75);
-        Keyboard.print(LOGIN);
-        delay(75);
         Keyboard.press(KEY_ENTER);
-        delay(75);
+        delay(TEMPO);
         Keyboard.releaseAll();
       }
     }
     if(Key==1)
     {
-        if(pressType == TAP)LedState=GREEN;
-    }
-    if(Key==2)
-    {
-      if(pressType == TAP)LedState=GAMING;
+      if(pressType == TAP)
+      {
+        Keyboard.press(KEY_ENTER);
+        delay(TEMPO);
+        Keyboard.releaseAll();
+        delay(TEMPO);
+        Keyboard.print(LOGIN1);
+        delay(TEMPO);
+
+        Keyboard.press(KEY_LEFT_SHIFT);
+        delay(TEMPO);
+        Keyboard.print(LOGIN2);
+        Keyboard.releaseAll();
+        delay(TEMPO);
+        Keyboard.print(LOGIN3);
+        delay(TEMPO);
+        Keyboard.press(KEY_ENTER);
+        delay(TEMPO);
+        Keyboard.releaseAll();
+      }
     }
 
-    if(Key == 3)
+    if(Key==2)
     {
-      if(pressType == TAP)LedState=WHITE;
+      if(pressType == TAP){Keyboard.press(KEY_LEFT_WINDOWS);Keyboard.print("o");} //o for l windows + l
     }
+    if(Key == 3);
+    
+    g_PSWDONE=1;
 }
 
 void passWord()
 {
   long Time = millis();
+  char oldLed = LedState;
   LedState = RED;
-  while((millis()- Time)< 5000)
+  g_PSWDONE = 0;
+  while(!digitalRead(3));
+  while((millis()- Time)< 5000 && g_PSWDONE==0)
   {
     ledDriver();
     poolingKeys(&pressedPwsKey);
   }
+  LedState = oldLed;
 }
 
 //Actions after a Key pressed.
@@ -62,24 +82,26 @@ void pressedKey(int Key, int pressType)
     if(Key==0)
     {
       if(pressType == TAP)Consumer.write(MEDIA_NEXT);
-      if(pressType == DOUBLETAP){Consumer.write(MEDIA_NEXT);Consumer.write(MEDIA_NEXT);}
+      if(pressType == DOUBLETAP); //Windows next virtual desktop
       if(pressType == LONG)Consumer.write(MEDIA_VOLUME_UP);
     }
     if(Key==1)
     {
       if(pressType == TAP)Consumer.write(MEDIA_PREV);
-      if(pressType == DOUBLETAP){Consumer.write(MEDIA_PREV);Consumer.write(MEDIA_PREV);}
+      if(pressType == DOUBLETAP);//Windows prev virtual desktop
       if(pressType == LONG)Consumer.write(MEDIA_VOLUME_DOWN);
     }
     if(Key==2)
     {
       if(pressType == TAP)Consumer.write(MEDIA_PLAY_PAUSE);
-      if(pressType == DOUBLETAP){Keyboard.press(KEY_LEFT_SHIFT);Keyboard.press(KEY_LEFT_CTRL);Keyboard.print("'");} // ' for m mute in discord  
+      if(pressType == DOUBLETAP);//Windows new virtual desktop
+      if(pressType == LONG){Keyboard.press(KEY_LEFT_SHIFT);Keyboard.press(KEY_LEFT_CTRL);Keyboard.print("'");} // ' for m mute in discord  
     }
 
     if(Key == 3)
     {
-      if(pressType == DOUBLETAP){Keyboard.press(KEY_LEFT_WINDOWS);Keyboard.print("o");} //o for l windows + l
+      if(pressType == TAP);//Windows del virtual desktop
+      if(pressType == DOUBLETAP){if(LedState==GAMING){LedState = WHITE;}else{LedState=GAMING;}} //o for l windows + l
       if(pressType == LONG)passWord();
     }
 }
