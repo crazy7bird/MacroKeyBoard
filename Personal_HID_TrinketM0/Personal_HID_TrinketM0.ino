@@ -67,7 +67,7 @@ void passWord()
   char oldLed = LedState;
   LedState = RED;
   g_PSWDONE = 0;
-  while(!digitalRead(3));
+  while(!digitalRead(3))ledDriver();
   while((millis()- Time)< 5000 && g_PSWDONE==0)
   {
     ledDriver();
